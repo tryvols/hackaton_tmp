@@ -1,0 +1,17 @@
+version: "3.9"  # optional since v1.27.0
+
+services:
+  backend:
+    build: ./backend
+    volumes:
+      - .:/code
+  backend_migrate:
+    extends:
+      service: backend
+    command: python backend/django_backend/manage.py migrate
+  backend_run:
+    extends:
+      service: backend
+    command: python backend/django_backend/manage.py runserver 0.0.0.0:${SERVER_PORT}
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
