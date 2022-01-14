@@ -130,9 +130,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    # This exception hanler has incorrect path (`No module named project` error).
-    # Specify correct one or left default handler (specify nothing)
-    #
-    # 'EXCEPTION_HANDLER': 'project.exceptions.core_exception_handler',
     'NON_FIELD_ERRORS_KEY': 'error',
 }
