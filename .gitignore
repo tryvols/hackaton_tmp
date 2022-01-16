@@ -1,1 +1,30 @@
+###########
+# Backend #
+###########
 **/db.sqlite3
+
+############
+# Frontend #
+############
+frontend/.DS_Store
+**/node_modules
+frontend/dist
+
+# local env files
+**/.env.local
+**/.env.*.local
+
+# Log files
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
