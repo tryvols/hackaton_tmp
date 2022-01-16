@@ -1,21 +1,15 @@
-import random
-
-import jwt
-
 from datetime import datetime, timedelta
-
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-
 from django.db import models
-
 import random
+import jwt
 
 
 def create_email_ver_code() -> str:
-    chars = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+    chars = 'abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     email_ver_code = ''
-    for i in range(48):
+    for i in range(8):
         email_ver_code += random.choice(chars)
     return email_ver_code
 
@@ -41,7 +35,6 @@ class UserManager(BaseUserManager):
         user = self.model(username=username, email=self.normalize_email(email))
         user.set_password(password)
         user.save()
-
         return user
 
     def create_superuser(self, username, email, password):
@@ -53,7 +46,6 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.is_staff = True
         user.save()
-
         return user
 
 
@@ -140,5 +132,5 @@ class User(AbstractBaseUser, PermissionsMixin):
             'id': self.pk,
             'exp': int(dt.strftime('%s'))
         }, settings.SECRET_KEY, algorithm='HS256')
-
-        return token.decode('utf-8')
+        print(token)
+        return token
