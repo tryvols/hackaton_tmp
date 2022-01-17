@@ -52,6 +52,7 @@ class RegistrationAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         print(f'serializer.data = {serializer.data}')
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
