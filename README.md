@@ -29,4 +29,8 @@ If needed - you can update it there.
 If you need to add some backend dependencies - you should add them to the `backend/requirements.txt` file
 
 ### Frontend
-Will be available soon!
+Frontend is available by the address:
+`https://localhost:8080/`
+
+Where `8080` is a port that is specified in the `.env` file.
+If needed - you can update it there.
