@@ -50,6 +50,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+
+    ID = models.AutoField(primary_key=True)
     # Каждому пользователю нужен понятный человеку уникальный идентификатор,
     # который мы можем использовать для предоставления User в пользовательском
     # интерфейсе. Мы так же проиндексируем этот столбец в базе данных для

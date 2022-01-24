@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'authentication.apps.AuthenticationConfig',
+    'video_conferencing.apps.VideoConferencingConfig',
     'rest_framework_swagger',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -130,7 +132,15 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+ASGI_APPLICATION = 'django_backend.asgi.application'
+
 REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
     'DEFAULT_AUTHENTICATION_CLASSES': ('authentication.backends.JWTAuthentication',)
+}
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channel.layers.InMemoryChannelLayer'
+    }
 }
