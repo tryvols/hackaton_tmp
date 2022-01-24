@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from rest_framework import status
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -18,20 +19,63 @@ class UserRetrieveUpdateAPIView(RetrieveUpdateAPIView):
         # сериализатор обрабатывал преобразования объекта User во что-то, что
         # можно привести к json и вернуть клиенту.
         serializer = self.serializer_class(request.user)
-
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        print(serializer.data)
+        return Response(status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
         serializer_data = request.data.get('user', {})
 
         # Паттерн сериализации, валидирования и сохранения - то, о чем говорили
+        # print(f'-- request.user = {request.user}')
+        print(f'-- serializer_data = {serializer_data}')
+        print(f'-- type(serializer_data) = {type(serializer_data)}')
+        if 'email' not in serializer_data.keys() and 'username' not in serializer_data.keys():
+            return HttpResponse("""{"user": {"detail": "Error. Invalid data"}}""")
+        if 'password' in serializer_data.keys():
+            return HttpResponse("""{"user": {"detail": "Error. Invalid data"}}""")
+
         serializer = self.serializer_class(
             request.user, data=serializer_data, partial=True
         )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return HttpResponse('')
+        return HttpResponse("""{"user": {"detail": "Error. Invalid data"}}""")
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class UserUpdatePasswordAPIView(RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = UserSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        # Здесь нечего валидировать или сохранять. Мы просто хотим, чтобы
+        # сериализатор обрабатывал преобразования объекта User во что-то, что
+        # можно привести к json и вернуть клиенту.
+        serializer = self.serializer_class(request.user)
+        print(serializer.data)
+        return Response(status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        serializer_data = request.data.get('user', {})
+
+        # Паттерн сериализации, валидирования и сохранения - то, о чем говорили
+        # print(f'-- request.user = {request.user}')
+        print(f'-- serializer_data = {serializer_data}')
+        print(f'-- type(serializer_data) = {type(serializer_data)}')
+        if 'email' in serializer_data.keys() or 'username' in serializer_data.keys():
+            return HttpResponse("""{"user": {"detail": "Error. Invalid data"}}""")
+        if 'old_password' not in serializer_data.keys() or 'new_password' not in serializer_data.keys():
+            return HttpResponse("""{"user": {"detail": "Error. Invalid data"}}""")
+
+        serializer = self.serializer_class(
+            request.user, data=serializer_data, partial=True
+        )
+
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return HttpResponse('')
+        return HttpResponse("""{"user": {"detail": "Error. Invalid data"}}""")
 
 
 class RegistrationAPIView(APIView):
@@ -64,9 +108,6 @@ class LoginAPIView(APIView):
     def post(self, request):
         user = request.data.get('user', {})
 
-        # Обратите внимание, что мы не вызываем метод save() сериализатора, как
-        # делали это для регистрации. Дело в том, что в данном случае нам
-        # нечего сохранять. Вместо этого, метод validate() делает все нужное.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
 
