@@ -9,10 +9,8 @@
 <script>
 export default {
   name: 'App',
-  data () {
-    return {
-      drawer: false
-    };
+  created () {
+    this.$store.dispatch('User/initDataOnLoad');
   }
 };
 </script>

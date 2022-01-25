@@ -3,7 +3,7 @@
     <h2 class="login-form__header">LOGIN</h2>
     <validation-observer ref="observer">
       <v-form @submit.prevent="submit">
-        <validation-provider v-slot="{ errors }" name="Name" rules="required|email">
+        <validation-provider v-slot="{ errors }" name="email" rules="required|email">
           <v-text-field
             v-model="email"
             :error-messages="errors"
@@ -16,7 +16,7 @@
           ></v-text-field>
         </validation-provider>
 
-        <validation-provider v-slot="{ errors }" name="email" rules="required">
+        <validation-provider v-slot="{ errors }" name="password" rules="required">
           <v-text-field
             v-model="password"
             :error-messages="errors"
@@ -31,6 +31,14 @@
             :type="showPass ? 'text' : 'password'"
           ></v-text-field>
         </validation-provider>
+
+        <div
+          class="login-form__error"
+          v-for="error in loginValidationErrors"
+          :key="error"
+        >
+          {{error}}
+        </div>
 
         <div class="text-center">
           <v-btn class="login-form__signin-btn" type="submit" color="white" rounded dark>
@@ -54,6 +62,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex';
 import { required, email } from 'vee-validate/dist/rules';
 import { extend, ValidationProvider, setInteractionMode, ValidationObserver } from 'vee-validate';
 
@@ -81,6 +90,9 @@ export default {
     showPass: false
   }),
   computed: {
+    ...mapState('User', [
+      'loginValidationErrors'
+    ]),
     params () {
       return {
         email: this.email,
@@ -89,14 +101,21 @@ export default {
     }
   },
   methods: {
+    ...mapActions('User', [
+      'login'
+    ]),
     async submit () {
       const valid = await this.$refs.observer.validate();
       if (valid) {
-        this.login(this.params); // action to login
+        await this.login(this.params);
+
+        if (!this.loginValidationErrors.length) {
+          this.clear();
+          this.$router.push('/');
+        }
       }
     },
     clear () {
-      // you can use this method to clear login form
       this.email = '';
       this.password = null;
       this.$refs.observer.reset();
@@ -125,6 +144,22 @@ export default {
     &__signup-btn {
       margin-top: 20px;
       width: 100%;
+    }
+
+    &__error {
+      font-size: 0.8em;
+
+      &::first-letter {
+        text-transform: capitalize;
+      }
+    }
+
+    span + &__error {
+      margin-top: -10px;
+    }
+
+    &__error + .text-center {
+      margin-top: 15px;
     }
   }
 </style>

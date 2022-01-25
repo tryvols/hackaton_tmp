@@ -18,7 +18,7 @@ services:
   frontend:
     build: ./frontend
     volumes:
-      - ./frontend:/app:consistent
+      - ./frontend:/app
       - exclude_node_modules_frontend:/app/node_modules
     environment:
       - HOST=0.0.0.0

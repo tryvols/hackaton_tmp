@@ -3,7 +3,7 @@
     <h2 class="registration__header">Registration</h2>
     <validation-observer ref="observer">
       <v-form @submit.prevent="submit">
-        <validation-provider v-slot="{ errors }" name="Email" rules="required|email">
+        <validation-provider v-slot="{ errors }" name="email" rules="required|email">
           <v-text-field
             v-model="email"
             :error-messages="errors"
@@ -16,7 +16,7 @@
           ></v-text-field>
         </validation-provider>
 
-        <validation-provider v-slot="{ errors }" name="Username" rules="required">
+        <validation-provider v-slot="{ errors }" name="username" rules="required">
           <v-text-field
             v-model="username"
             :error-messages="errors"
@@ -29,7 +29,7 @@
           ></v-text-field>
         </validation-provider>
 
-        <validation-provider v-slot="{ errors }" name="Password" rules="required" ref="Password">
+        <validation-provider v-slot="{ errors }" name="password" rules="required" ref="Password">
           <v-text-field
             v-model="password"
             :error-messages="errors"
@@ -45,13 +45,21 @@
           ></v-text-field>
         </validation-provider>
 
+        <div
+          class="registration__error"
+          v-for="error in registrationValidationErrors"
+          :key="error"
+        >
+          {{error}}
+        </div>
+
         <div class="text-center">
           <v-btn class="registration__signin-btn" type="submit" rounded color="white" dark>
-            Sign In
+            Sign Up
           </v-btn>
 
           <v-btn class="registration__signup-btn" text rounded dark outlined @click="moveToLogin">
-            Sign Up
+            Sign In
           </v-btn>
         </div>
       </v-form>
@@ -60,6 +68,7 @@
 </template>
 
 <script>
+import { mapActions, mapState } from 'vuex';
 import { required, email } from 'vee-validate/dist/rules';
 import { extend, ValidationProvider, setInteractionMode, ValidationObserver } from 'vee-validate';
 
@@ -88,22 +97,33 @@ export default {
     showPass: false
   }),
   computed: {
+    ...mapState('User', [
+      'registrationValidationErrors'
+    ]),
     params () {
       return {
         email: this.email,
-        password: this.password
+        password: this.password,
+        username: this.username
       };
     }
   },
   methods: {
+    ...mapActions('User', [
+      'register'
+    ]),
     async submit () {
       const valid = await this.$refs.observer.validate();
       if (valid) {
-        this.login(this.params); // action to login
+        await this.register(this.params);
+
+        if (!this.registrationValidationErrors.length) {
+          this.clear();
+          this.$router.push('/');
+        }
       }
     },
     clear () {
-      // you can use this method to clear login form
       this.username = '';
       this.email = '';
       this.password = null;
@@ -131,6 +151,22 @@ export default {
     &__signup-btn {
       margin-top: 20px;
       width: 100%;
+    }
+
+    &__error {
+      font-size: 0.8em;
+
+      &::first-letter {
+        text-transform: capitalize;
+      }
+    }
+
+    span + &__error {
+      margin-top: -10px;
+    }
+
+    &__error + .text-center {
+      margin-top: 15px;
     }
   }
 </style>
