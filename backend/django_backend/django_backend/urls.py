@@ -19,5 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('authentication.urls', namespace='authentication')),
+    path('api/authentication/', include('authentication.urls', namespace='authentication')),
+    path('api/conference/', include('video_conferencing.urls', namespace='conference')),
 ]
