@@ -32,8 +32,11 @@ class UserManager(BaseUserManager):
         if password is None:
             raise TypeError('Users must have an password.')
 
-        user = self.model(username=username, email=self.normalize_email(email))
+        user = self.model(username=username, email=self.normalize_email(email), ver_email_code=create_email_ver_code())
         user.set_password(password)
+        print(f'-- user.username = {user.username}')
+        print(f'-- user.email = {user.email}')
+        print(f'-- user.ver_email_code = {user.ver_email_code}')
         user.save()
         return user
 
