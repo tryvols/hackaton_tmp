@@ -30,11 +30,21 @@ class CreateConferenceSerializer(serializers.ModelSerializer):
         return conference
 
 
+class DeleteConferenceSerializer(serializers.ModelSerializer):
+    """ Сериализация удаления участника конфы конференции. """
+
+    class Meta:
+        model = Members
+        # Перечислить все поля, которые могут быть включены в запрос
+        # или ответ, включая поля, явно указанные выше.
+        fields = ['ID']
+
+
 class AddMemberSerializer(serializers.ModelSerializer):
-    """ Сериализация создания конференции. """
+    """ Сериализация создания участника конфы. """
 
     ID = serializers.IntegerField(read_only=True)
-    user_id = serializers.IntegerField(read_only=True)
+    user_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Members
@@ -44,9 +54,26 @@ class AddMemberSerializer(serializers.ModelSerializer):
 
     def create(self, data):
         print(f'--- start func "create" in class AddMemberSerializer ---')
-        print(f'-- data = {data}')
         conference_id = data.get('conference_id', None)
         print(f'-- conference_id = {conference_id}')
         is_admin = data.get('is_admin', None)
         print(f'-- is_admin = {is_admin}')
-        return conference_id, is_admin
+        user_id = data.get('user_id', None)
+        user = User.objects.get(ID=user_id)
+        print(f'-- user_id = {user_id}')
+        print(f'-- conference_id = {conference_id}')
+
+        member = Members.objects.create(is_admin=is_admin, user_id=user, conference_id=conference_id)
+        return member
+
+
+class DeleteMemberSerializer(serializers.ModelSerializer):
+    """ Сериализация удаления участника конфы конференции. """
+
+    is_admin = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Members
+        # Перечислить все поля, которые могут быть включены в запрос
+        # или ответ, включая поля, явно указанные выше.
+        fields = ['ID', 'user_id', 'conference_id', 'is_admin']
