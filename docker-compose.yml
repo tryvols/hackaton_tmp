@@ -26,6 +26,14 @@ services:
     command: npm run serve -- --port ${CLIENT_PORT} --host 0.0.0.0
     ports:
       - ${CLIENT_PORT}:${CLIENT_PORT}
+  webrtc_backend:
+    build: ./webrtc_backend
+    volumes:
+      - ./webrtc_backend:/app
+    command: npm run start
+    ports:
+      - ${WEBRTC_HTTP_PORT}:${WEBRTC_HTTP_PORT}
+      - ${WEBRTC_HTTPS_PORT}:${WEBRTC_HTTPS_PORT}
 
 volumes:
   exclude_node_modules_frontend:

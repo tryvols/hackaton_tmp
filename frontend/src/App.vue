@@ -1,8 +1,6 @@
 <template>
   <v-app id="app">
-    <keep-alive :include="['Login', 'Registration']">
-      <router-view></router-view>
-    </keep-alive>
+    <router-view></router-view>
   </v-app>
 </template>
 

@@ -32,5 +32,10 @@ export const routes = [
     path: '/',
     name: 'Home',
     component: () => import('../views/Home.vue')
+  },
+  {
+    path: '/conference/:code',
+    name: 'Conference',
+    component: () => import('../views/Conference.vue')
   }
 ];

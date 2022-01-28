@@ -1,0 +1,16 @@
+{
+  "name": "webrtc_backend",
+  "version": "1.0.0",
+  "description": "Backend for WebRTC purpose",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "TryVols",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^8.4.2"
+  },
+  "type": "module"
+}
