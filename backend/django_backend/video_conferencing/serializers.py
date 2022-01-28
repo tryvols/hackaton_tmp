@@ -59,8 +59,8 @@ class AddMemberSerializer(serializers.ModelSerializer):
         is_admin = data.get('is_admin', None)
         print(f'-- is_admin = {is_admin}')
         user_id = data.get('user_id', None)
+        print(data)
         user = User.objects.get(ID=user_id)
-        print(f'-- user_id = {user_id}')
         print(f'-- conference_id = {conference_id}')
 
         member = Members.objects.create(is_admin=is_admin, user_id=user, conference_id=conference_id)

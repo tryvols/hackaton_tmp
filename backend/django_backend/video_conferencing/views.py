@@ -25,7 +25,6 @@ class CreateConferenceAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         print(f"-- conference.data['ID'] = {serializer.data['ID']}")
-        conference = Conference.objects.get(ID=serializer.data['ID'])
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -91,7 +90,7 @@ class AddMemberAPIView(APIView):
         data = request.data.get('member', {})
         # # print(f'-- data["request"] = {data["request"]}')
         data['user_id'] = request.user.ID
-        # print(f'-- data = {data}')
+        print(f'-- data = {data}')
         member = self.serializer_class(data=data)
         # conference = Conference.objects.get(ID=conference_id)
         # member = Members.objects.create(is_admin=is_admin, user_id=request.user, conference_id=conference)

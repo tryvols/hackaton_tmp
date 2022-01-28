@@ -19,12 +19,13 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # Клиентская сторона не должна иметь возможность отправлять токен вместе с
     # запросом на регистрацию. Сделаем его доступным только на чтение.
     token = serializers.CharField(max_length=255, read_only=True)
+    ID = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = User
         # Перечислить все поля, которые могут быть включены в запрос
         # или ответ, включая поля, явно указанные выше.
-        fields = ['email', 'token', 'username', 'password']
+        fields = ['ID', 'email', 'token', 'username', 'password']
 
     def create(self, validated_data):
         # Использовать метод create_user, который мы
@@ -35,6 +36,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.Serializer):
+    ID = serializers.IntegerField(read_only=True)
     email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
@@ -84,6 +86,7 @@ class LoginSerializer(serializers.Serializer):
         # Метод validate должен возвращать словать проверенных данных. Это
         # данные, которые передются в т.ч. в методы create и update.
         return {
+            'ID': user.ID,
             'email': user.email,
             'username': user.username,
             'token': user.token
@@ -96,6 +99,8 @@ class UserSerializer(serializers.ModelSerializer):
     # Пароль должен содержать от 8 до 128 символов. Это стандартное правило. Мы
     # могли бы переопределить это по-своему, но это создаст лишнюю работу для
     # нас, не добавляя реальных преимуществ, потому оставим все как есть.
+    ID = serializers.IntegerField(read_only=True)
+
     password = serializers.CharField(
         max_length=128,
         min_length=8,
@@ -104,7 +109,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'token',)
+        fields = ('ID', 'email', 'username', 'password', 'token',)
 
         # Параметр read_only_fields является альтернативой явному указанию поля
         # с помощью read_only = True, как мы это делали для пароля выше.
