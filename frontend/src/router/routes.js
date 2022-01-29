@@ -5,7 +5,7 @@ export const routes = [
     meta: {
       guest: true
     },
-    component: () => import('../views/Auth.vue'),
+    component: () => import('../views/auth/Auth.vue'),
     children: [
       {
         path: 'login',
@@ -13,7 +13,7 @@ export const routes = [
         // route level code-splitting
         // this generates a separate chunk (login.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
-        component: () => import('../views/Login.vue'), /* webpackChunkName: "login" */
+        component: () => import('../views/auth/Login.vue'), /* webpackChunkName: "login" */
         meta: {
           guest: true
         }
@@ -21,7 +21,7 @@ export const routes = [
       {
         path: 'registration',
         name: 'Registration',
-        component: () => import('../views/Registration.vue'),
+        component: () => import('../views/auth/Registration.vue'),
         meta: {
           guest: true
         }
@@ -31,11 +31,11 @@ export const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('../views/Home.vue')
+    component: () => import('../views/home/Home.vue')
   },
   {
     path: '/conference/:code',
     name: 'Conference',
-    component: () => import('../views/Conference.vue')
+    component: () => import('../views/conference/Conference.vue')
   }
 ];
