@@ -6,7 +6,7 @@
 ############
 # Frontend #
 ############
-frontend/.DS_Store
+**/.DS_Store
 **/node_modules
 frontend/dist
 

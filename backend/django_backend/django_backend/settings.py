@@ -25,8 +25,13 @@ SECRET_KEY = 'django-insecure-9(yam-pn3&!g$12y-w$=1i1iupidg@2q3nyzrsrgf$*xer5)zp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8081',
+    'https://localhost:8081'
+]
 
 # Application definition
 
@@ -38,9 +43,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'authentication.apps.AuthenticationConfig',
+    'video_conferencing.apps.VideoConferencingConfig',
+    'rest_framework_swagger',
+    'channels',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -129,6 +139,15 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+ASGI_APPLICATION = 'django_backend.asgi.application'
+
 REST_FRAMEWORK = {
     'NON_FIELD_ERRORS_KEY': 'error',
+    'DEFAULT_AUTHENTICATION_CLASSES': ('authentication.backends.JWTAuthentication',)
+}
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channel.layers.InMemoryChannelLayer'
+    }
 }

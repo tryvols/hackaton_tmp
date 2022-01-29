@@ -1,18 +1,14 @@
 <template>
   <v-app id="app">
-    <keep-alive :include="['Login', 'Registration']">
-      <router-view></router-view>
-    </keep-alive>
+    <router-view></router-view>
   </v-app>
 </template>
 
 <script>
 export default {
   name: 'App',
-  data () {
-    return {
-      drawer: false
-    };
+  created () {
+    this.$store.dispatch('User/initDataOnLoad');
   }
 };
 </script>
