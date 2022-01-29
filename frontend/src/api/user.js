@@ -1,7 +1,7 @@
 import { backend } from '../plugins/axios';
 
 const login = async ({ email, password }) => {
-  return backend.post('/users/login/', {
+  return backend.post('/authentication/users/login/', {
     user: {
       email,
       password
@@ -10,7 +10,7 @@ const login = async ({ email, password }) => {
 };
 
 const register = async ({ email, username, password }) => {
-  return backend.post('/users/register/', {
+  return backend.post('/authentication/users/register/', {
     user: {
       email,
       username,

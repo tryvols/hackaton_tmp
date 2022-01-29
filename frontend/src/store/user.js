@@ -29,7 +29,7 @@ export const User = {
 
   actions: {
     initDataOnLoad: ({ commit }) => {
-      const { email, username } = getUserData();
+      const { email = '', username = '' } = getUserData() ?? {};
       commit('setUserCredentials', { email, username });
     },
 

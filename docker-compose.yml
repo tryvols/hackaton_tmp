@@ -16,7 +16,10 @@ services:
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      target: build
+      dockerfile: Dockerfile
     volumes:
       - ./frontend:/app
       - exclude_node_modules_frontend:/app/node_modules

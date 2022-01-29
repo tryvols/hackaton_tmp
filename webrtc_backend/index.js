@@ -2,7 +2,9 @@
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
-import WebSocket, {WebSocketServer} from 'ws';
+import WebSocket from 'ws';
+
+const WebSocketServer = WebSocket.Server;
 
 const HTTPS_PORT = 8443;
 const HTTP_PORT = 8008;
