@@ -6,7 +6,7 @@
       :uuid="username"
       :name="username"
       :stream="localStream"
-      :styles="videoSize"
+      :styles="videoSizeStyles"
     />
 
     <!-- Other users videos -->
@@ -16,15 +16,26 @@
       :uuid="uuid"
       :name="name"
       :stream="stream"
-      :styles="videoSize"
+      :styles="videoSizeStyles"
       :buttonsPanel="true"
       @onClose="handleRemovePeer"
+    />
+
+    <conference-controls-panel
+      :enabledVideoByDefault="isEnabledVideoByDefault"
+      :mutedByDefault="isMutedByDefault"
+      @finishCall="leftThisCall"
+      @mute="muteMicrophone"
+      @unmute="unmuteMicrophone"
+      @enableVideo="enableCamera"
+      @disableVideo="disableCamera"
     />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import ConferenceControlsPanel from './ConferenceControlsPanel.vue';
 import ConferenceVideo from './ConferenceVideo.vue';
 
 const WS_PORT = 8443;
@@ -56,7 +67,10 @@ const getVideosCountBounds = videosCount => {
 };
 
 export default {
-  components: { ConferenceVideo },
+  components: {
+    ConferenceVideo,
+    ConferenceControlsPanel
+  },
   mounted () {
     this.connect();
   },
@@ -72,10 +86,16 @@ export default {
     ...mapState('User', [
       'username'
     ]),
+    isEnabledVideoByDefault () {
+      return true;
+    },
+    isMutedByDefault () {
+      return true;
+    },
     conferenceCode () {
       return this.$route.params.code;
     },
-    videoSize () {
+    videoSizeStyles () {
       const localVideo = 1;
       const videosCount = localVideo + this.videosData.length;
       const videosCountBounds = getVideosCountBounds(videosCount);
@@ -88,6 +108,36 @@ export default {
     }
   },
   methods: {
+    /**
+     * Camera and microphone states
+     */
+    setMicrophoneState ({ muted }) {
+      this.localStream.getAudioTracks()[0].enabled = !muted;
+    },
+
+    unmuteMicrophone () {
+      this.setMicrophoneState({ muted: false });
+    },
+
+    muteMicrophone () {
+      this.setMicrophoneState({ muted: true });
+    },
+
+    setCameraState ({ enabled }) {
+      this.localStream.getVideoTracks()[0].enabled = enabled;
+    },
+
+    enableCamera () {
+      this.setCameraState({ enabled: true });
+    },
+
+    disableCamera () {
+      this.setCameraState({ enabled: false });
+    },
+
+    /**
+     * Update videos array to show/hide videos when connection changes
+     */
     updateVideo () {
       this.videosData = Object.entries(this.peerConnections)
         .map(([uuid, conn]) => ({
@@ -98,12 +148,23 @@ export default {
         .filter(({ stream }) => Boolean(stream));
     },
 
+    /**
+     * Methods to remove connection
+     */
+    leftThisCall () {
+      this.closeConnection();
+      setTimeout(() => {
+        alert('You left this call!');
+      }, 10);
+    },
+
     handleRemovePeer (uuid) {
       this.RTCServerConnection.send(JSON.stringify({
         forceDisconnect: true,
         uuid: this.username,
         peerToRemove: uuid,
-        dest: 'all'
+        dest: 'all',
+        channel: this.conferenceCode
       }));
       this.cleanUpPeer(uuid);
     },
@@ -123,22 +184,28 @@ export default {
       this.videosData = [];
     },
 
+    /**
+     * Rood method to begin and configure connection
+     */
     async connect () {
       if (navigator.mediaDevices.getUserMedia) {
         try {
           this.localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+          this.setCameraState({ enabled: this.isEnabledVideoByDefault });
+          this.setMicrophoneState({ muted: this.isMutedByDefault });
         } catch (error) {
           this.handleRTCError(error);
         }
 
         try {
-          this.RTCServerConnection = new WebSocket('wss://' + window.location.hostname + ':' + WS_PORT);
+          this.RTCServerConnection = new WebSocket('ws://' + window.location.hostname + ':' + WS_PORT);
           this.RTCServerConnection.onmessage = this.handleMessageFromServer;
           this.RTCServerConnection.onopen = event => {
             this.RTCServerConnection.send(JSON.stringify({
               displayName: this.username,
               uuid: this.username,
-              dest: 'all'
+              dest: 'all',
+              channel: this.conferenceCode
             }));
           };
         } catch (error) {
@@ -149,6 +216,9 @@ export default {
       }
     },
 
+    /**
+     * Something like a router for web sockets messages
+     */
     async handleMessageFromServer (message) {
       const signal = JSON.parse(message.data);
       const {
@@ -158,7 +228,8 @@ export default {
         forceDisconnect,
         peerToRemove,
         sdp,
-        ice
+        ice,
+        channel
       } = signal;
       // Conditions
       const messageFromCurrentUser = peerUuid === this.username;
@@ -166,9 +237,10 @@ export default {
         dest !== this.username &&
         dest !== 'all'
       );
+      const isCurrentChannel = channel === this.conferenceCode;
 
       // Ignore messages that are not for us or from ourselves
-      if (messageFromCurrentUser || forbiddenMessage) {
+      if (messageFromCurrentUser || forbiddenMessage || !isCurrentChannel) {
         return;
       }
 
@@ -195,6 +267,9 @@ export default {
       }
     },
 
+    /**
+     * Web sockets messages handlers and helpers for them
+     */
     handleInitConnection ({ peerUuid, displayName }) {
       // set up peer connection object for a newcomer peer
       this.setUpPeer({ peerUuid, displayName });
@@ -202,7 +277,8 @@ export default {
       this.RTCServerConnection.send(JSON.stringify({
         displayName: this.username,
         uuid: this.username,
-        dest: peerUuid
+        dest: peerUuid,
+        channel: this.conferenceCode
       }));
     },
 
@@ -276,7 +352,8 @@ export default {
         this.RTCServerConnection.send(JSON.stringify({
           sdp: this.peerConnections[peerUuid].pc.localDescription,
           uuid: this.username,
-          dest: peerUuid
+          dest: peerUuid,
+          channel: this.conferenceCode
         }));
       } catch (error) {
         this.handleRTCError(error);
@@ -291,7 +368,8 @@ export default {
       this.RTCServerConnection.send(JSON.stringify({
         ice: event.candidate,
         uuid: this.username,
-        dest: peerUuid
+        dest: peerUuid,
+        channel: this.conferenceCode
       }));
     },
 

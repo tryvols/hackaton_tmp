@@ -5,7 +5,7 @@
     @mouseover="showVideoButtonsPanel"
     @mouseleave="hideVideoButtonsPanel"
   >
-    <video class="conference-video" autoplay muted :srcObject.prop="stream"></video>
+    <video class="conference-video" autoplay :srcObject.prop="stream"></video>
     <div class="conference-video__label">{{ name }}</div>
     <video-buttons-panel
       class="conference-video__buttons-panel"
@@ -73,6 +73,8 @@ export default {
     &__container {
       overflow: hidden;
       position: relative;
+      border: 2px solid grey;
+      box-sizing: border-box;
     }
 
     &__label {
