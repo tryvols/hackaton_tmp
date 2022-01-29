@@ -12,7 +12,7 @@
       </v-card-title>
 
       <v-card-text class="create-conference-dialog__code">
-        {{ "someConferenceCode" | confCodeToLink }}
+        {{ conferenceCode | confCodeToLink }}
       </v-card-text>
 
       <v-card-actions>
@@ -30,14 +30,28 @@
 </template>
 
 <script>
+import { conferenceApi } from '../../api/conference';
+
 export default {
   name: 'CreateConferenceDialog',
+  data () {
+    return {
+      conferenceCode: null
+    };
+  },
   model: {
     prop: 'isShown',
     event: 'change'
   },
   props: {
     isShown: Boolean
+  },
+  watch: {
+    isShown (next, prev) {
+      if (prev !== next && next === true) {
+        this.createNewConference();
+      }
+    }
   },
   filters: {
     confCodeToLink (conferenceCode) {
@@ -49,6 +63,10 @@ export default {
     }
   },
   methods: {
+    async createNewConference () {
+      const conference = await conferenceApi.createConference();
+      this.conferenceCode = conference?.data?.conference?.url;
+    },
     updateModal (value) {
       this.$emit('change', value);
     },

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { cleanAuthToken } from '../storage/auth-token';
+import { cleanAuthToken } from '../../storage/auth-token';
 import CreateConferenceDialog from './CreateConferenceDialog.vue';
 
 export default {
