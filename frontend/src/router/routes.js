@@ -5,6 +5,7 @@ export const routes = [
     meta: {
       guest: true
     },
+    redirect: '/auth/login',
     component: () => import('../views/auth/Auth.vue'),
     children: [
       {
