@@ -1,0 +1,18 @@
+version: "3.9"  # optional since v1.27.0
+
+services:
+  backend:
+    image: tryvols/hackaton_backend:2
+    build: ./backend
+    ports:
+      - 8000:8000
+  frontend:
+    image: tryvols/hackaton_frontend:2
+    build: ./frontend
+    ports:
+      - 80:80
+  webrtc_backend:
+    image: tryvols/hackaton_webrtc_backend:1
+    build: ./webrtc_backend
+    ports:
+      - 8443:8443
